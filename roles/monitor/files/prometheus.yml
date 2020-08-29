@@ -1,0 +1,56 @@
+# https://www.techscore.com/blog/2017/12/07/prometheus-monitoring-setting/
+
+global:
+ # scrape_interval: Prometheusがexporterなどに情報を取りに行く間隔
+ # 今回は Prometheus が 各種 exporter に対して情報を 15 秒間隔で取りに行きます
+ scrape_interval:     15s
+ # evaluation_interval: ルールの評価を行う間隔
+ # 今回のルールファイルは alert_rules.yml になります
+ evaluation_interval: 15s 
+ 
+alerting:
+ alertmanagers:
+ - static_configs:
+   # targets: alert push する対象
+   # 今回はローカルの AlertManager (ポート番号:9093) に対して push します
+   - targets:
+     - 'localhost:9093' 
+ 
+# prometheus が取得した情報を評価するルールの設定ファイルのパス
+rule_files:
+ - "alert_rules.yml"
+ 
+# 監視対象の設定
+scrape_configs:
+ - job_name: 'node'
+   static_configs:
+     # targets: Prometheus が情報を pull する対象のホスト名もしくはIPアドレスと、ポート番号を設定
+     # ここでは node_exporter (ポート番号:9100) を指定しています
+     - targets:
+       - 'example.com:9100'
+ 
+ - job_name: 'apache'
+   static_configs:
+     # targets: Prometheus が情報を pull する対象のホスト名もしくはIPアドレスと、ポート番号を設定
+     # ここでは apache_exporter (ポート番号:9117) を指定しています
+     - targets:
+       - 'example.com:9117'
+ 
+ - job_name: 'http_200'
+   metrics_path: /probe
+   params:
+     # 今回は http アクセスをするので、 http_2xx を指定しています
+     module: ['http_2xx']
+   static_configs:
+     # 監視対象のサービスのURLを指定
+     - targets:
+       - 'http://example.com'
+   relabel_configs:
+     - source_labels: [__address__]
+       target_label: __param_target
+     - source_labels: [__param_target]
+       target_label: instance
+     - target_label: __address__
+       # Prometheus が情報を pull 対象のホスト名もしくはIPアドレスと、ポート番号を設定
+       # ここでは ローカルの blackbox_exporter (ポート番号:9115) を指定しています
+       replacement: localhost:9115

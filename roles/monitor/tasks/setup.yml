@@ -1,0 +1,14 @@
+---
+- name: create group prometheus
+  group:
+    name: prometheus
+    state: present
+
+- name: Add user prometheus to group prometheus
+  user:
+    name: prometheus
+    shell: /bin/bash
+    groups: prometheus
+    append: yes
+
+

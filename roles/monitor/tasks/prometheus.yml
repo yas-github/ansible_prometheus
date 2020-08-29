@@ -1,0 +1,46 @@
+---
+- name: check exists prometheus
+  stat:
+    path: /usr/local/src/prometheus
+  register: prometheus
+
+- name: Download prometheus
+  unarchive:
+    src: https://github.com/prometheus/prometheus/releases/download/v2.21.0-rc.0/prometheus-2.21.0-rc.0.linux-amd64.tar.gz
+    dest: /usr/local/src/
+    remote_src: yes
+    owner: prometheus
+    group: prometheus
+  when: prometheus == false
+
+- name: Rename Directory
+  command: mv /usr/local/src/prometheus-2.21.0-rc.0.linux-amd64 /usr/local/src/prometheus
+  when: prometheus == false
+
+- name: copy items to /usr/local/bin
+  copy:
+    src: /usr/local/src/prometheus/{{ item }}
+    dest: /usr/local/bin/
+    mode: "0755"
+    remote_src: yes
+  with_items:
+    - prometheus
+    - promtool
+
+- name: add modified prometheus.yml
+  copy:
+    src: prometheus.yml
+    dest: /usr/local/src/prometheus
+
+- name: add prometheus.service to systemd
+  copy:
+    src: prometheus.service
+    dest: /usr/lib/systemd/system/
+
+- name: enable and start prometheus
+  systemd:
+    name: prometheus
+    state: restarted
+    daemon_reload: yes
+    enabled: yes
+
