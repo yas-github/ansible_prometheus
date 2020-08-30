@@ -1,2 +1,5 @@
 [monitor]
 ansible_monitor
+
+[target]
+ansible_target
