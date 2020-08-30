@@ -11,11 +11,11 @@
     remote_src: yes
     owner: prometheus
     group: prometheus
-  when: prometheus == false
+  when: prometheus.stat.exists == false
 
 - name: Rename Directory
   command: mv /usr/local/src/prometheus-2.21.0-rc.0.linux-amd64 /usr/local/src/prometheus
-  when: prometheus == false
+  when: prometheus.stat.exists == false
 
 - name: copy items to /usr/local/bin
   copy:
