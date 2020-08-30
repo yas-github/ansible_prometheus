@@ -1,5 +1,5 @@
 ---
-- name: check nginx_repo
+- name: check nginx.service
   stat:
     path: /usr/lib/systemd/system/nginx.service
   register: nginx_service
@@ -13,7 +13,7 @@
   yum:
     name: nginx
     state: present
-  when: nginx_service == false
+  when: nginx_service.stat.exists == false
 
 - name: enable Nginx
   systemd:
