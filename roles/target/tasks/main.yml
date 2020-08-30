@@ -4,3 +4,6 @@
 
 - import_tasks: nginx.yml
   tags: nginx
+
+- import_tasks: node_exporter.yml
+  tags: node_exporter.yml

@@ -1,0 +1,12 @@
+[Unit]
+Description=Node Exporter for Prometheus
+After=network.target
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/local/bin/node_exporter
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

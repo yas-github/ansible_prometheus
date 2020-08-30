@@ -28,6 +28,7 @@ Vagrant.configure("2") do |config|
     target.vm.network :private_network, ip: "192.168.33.21", virtualbox__intnet: "intnet"
     target.vm.network :forwarded_port,  guest: 80, host: 8080
     target.vm.network :forwarded_port,  guest: 22, host: 2205, id: "ssh"
+    target.vm.network :forwarded_port,  guest: 9100, host: 9100
   end
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
