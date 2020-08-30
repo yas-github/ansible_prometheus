@@ -1,0 +1,37 @@
+groups:
+- name: node_exporter
+  rules:
+  # alert: アラート名
+  - alert: InstanceDown
+    # expr: alert push の閾値
+    # インスタンスダウン (今回の設定では node_exporter, apache_exporter, blackbox_exporter が
+    # 起動されていないことと同値) を条件にしています
+    expr: up == 0
+    # for: alert push の expr の時間。
+    # インスタンスダウンした状態が 5 分間続いた時に、alert push されます
+    for: 5m 
+    labels:
+      severity: critical
+    # annotations: アラートの通知内容
+    annotations:
+      summary: "Instance {{ $labels.instance }} down"
+      description: "{{ $labels.instance }} has been down for more than 5 minutes." 
+  - alert: cpu_used
+    # CPU 使用率が 90% を超えた時を条件にしています
+    expr: 100 * (1 - avg(rate(node_cpu{job='node',mode='idle'}[5m])) BY (instance)) > 90
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "cpu {{ $labels.instance }} used over 90%"
+      description: "cpu of {{ $labels.instance }} has been used over 90% for more than 5 minutes."
+  - alert: memory_used
+    # メモリ使用量が 90% を超えた時を条件にしています
+    expr: 100 * (1 - node_memory_MemFree{job='node'} / node_memory_MemTotal{job='node'}) > 90 
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "memory {{ $labels.instance }} used over 90%"
+      description: "memory of {{ $labels.instance }} has been used over 90% for more than 5 minutes."
+ 

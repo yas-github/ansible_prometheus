@@ -1,0 +1,55 @@
+---
+- name: check exists alertmanager
+  stat:
+    path: /usr/lib/systemd/system/alertmanager.service
+  register: alertmanager
+
+- name: Install alertmanager
+  unarchive:
+    src: https://github.com/prometheus/alertmanager/releases/download/v0.21.0/alertmanager-0.21.0.linux-amd64.tar.gz
+    dest: /usr/local/src
+    remote_src: yes
+  when: alertmanager.stat.exists == false
+
+- name: Rename Directory
+  command: mv /usr/local/src/alertmanager-0.21.0.linux-amd64 /usr/local/src/alertmanager
+
+- name: copy alertmanager to /usr/local/bin
+  copy:
+    src: /usr/local/src/alertmanager/alertmanager
+    dest: /usr/local/bin/
+    mode: 0755
+    owner: "root"
+    group: "root"
+    remote_src: yes
+
+- name: mkdir alert_rules and templates
+  file:
+    path: /usr/local/src/alertmanager/{{ item }}
+    mode: 0755
+    owner: "root"
+    group: "root"
+    state: directory
+  with_items:
+    - rules
+    - templates
+
+- name: deploy alert_rules and templates
+  copy:
+    src: alertmanager/{{ item }}
+    dest: /usr/local/src/alertmanager/{{ item }}
+  with_items:
+    - rules/alert_rules.yml
+    - templates/default.tmpl
+
+- name: add alertmanager.service to systemd
+  copy:
+    src: alertmanager/alertmanager.service
+    dest: /usr/lib/systemd/system/
+
+- name: enable and start alertmanager
+  systemd:
+    name: alertmanager
+    state: restarted
+    daemon_reload: yes
+    enabled: yes

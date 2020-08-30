@@ -1,0 +1,19 @@
+{{ define "alert.title" }}[{{ .Status | toUpper }}] {{ .CommonLabels.instance }} {{ .CommonAnnotations.summary }}{{ end }}
+
+{{ define "alert.slack.detail" }}
+*Host:* {{ .CommonLabels.instance }}{{ if eq .Status "firing" }}
+*Value:* {{ .CommonAnnotations.value }}
+*Alertmanager:* "http://test-kanshi-server01/alertmanager/"
+*StartDate:* {{ range .Alerts }}{{ .StartsAt }}{{ end }}
+*Description:* {{ .CommonAnnotations.description }}{{ else }}
+*EndDate:* {{ range .Alerts }}{{ .EndsAt }}{{ end }}{{ end }}
+{{ end }}
+
+{{ define "alert.email.detail" }}
+Host: {{ .CommonLabels.instance }}{{ if eq .Status "firing" }}
+Value: {{ .CommonAnnotations.value }}
+Alertmanager: "http://test-kanshi-server01/alertmanager/"
+StartDate: {{ range .Alerts }}{{ .StartsAt }}{{ end }}
+Description: {{ .CommonAnnotations.description }}{{ else }}
+EndDate: {{ range .Alerts }}{{ .EndsAt }}{{ end }}{{ end }}
+{{ end }}

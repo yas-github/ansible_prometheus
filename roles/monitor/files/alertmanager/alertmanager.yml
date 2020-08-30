@@ -1,0 +1,29 @@
+route:
+  receiver: "slack"
+  group_by: ['alertname','instance']
+  group_wait:      30s
+  group_interval:  5m
+  repeat_interval: 30m
+  routes:
+  - receiver: "slack"
+    repeat_interval: 24h
+    match:
+      notification_option: 1day
+templates:
+  - '/etc/prometheus/alertmanager/templates/*.tmpl'
+
+receivers:
+- name: 'slack'
+  slack_configs:
+    - api_url: 'https://hooks.slack.com/services/XXXXXXX'
+      channel: '#XXXXXXXXXXX'
+      title: '{{ template "alert.title" . }}'
+      text: '{{ template "alert.slack.detail" . }}'
+      title_link: ''
+      send_resolved: true
+    - api_url: 'https://hooks.slack.com/services/XXXXXXX'
+      channel: '#XXXXXXXXXXX'
+      title: '{{ template "alert.title" . }}'
+      text: '{{ template "alert.slack.detail" . }}'
+      title_link: ''
+      send_resolved: true

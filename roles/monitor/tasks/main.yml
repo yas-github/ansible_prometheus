@@ -4,3 +4,6 @@
 
 - import_tasks: prometheus.yml
   tags: prometheus
+
+- import_tasks: alertmanager.yml
+  tags: alertmanager
