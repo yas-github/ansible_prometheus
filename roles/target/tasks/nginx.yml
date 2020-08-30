@@ -1,0 +1,23 @@
+---
+- name: check nginx_repo
+  stat:
+    path: /usr/lib/systemd/system/nginx.service
+  register: nginx_service
+
+- name: add nginx.repo
+  copy:
+    src: nginx.repo
+    dest: /etc/yum.repos.d/nginx.repo
+
+- name: Install Nginx
+  yum:
+    name: nginx
+    state: present
+  when: nginx_service == false
+
+- name: enable Nginx
+  systemd:
+    name: nginx
+    state: restarted
+    daemon_reload: yes
+    enabled: yes
